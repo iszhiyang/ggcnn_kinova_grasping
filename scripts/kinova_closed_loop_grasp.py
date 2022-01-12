@@ -110,7 +110,7 @@ def command_callback(msg):
 
             # Calculate Pose of Grasp in Robot Base Link Frame
             # Average over a few predicted poses to help combat noise.
-            gp_base = convert_pose(gp, 'camera_depth_optical_frame', 'base_link') #  transfer grasping point from camera frame to base link frame
+            gp_base = convert_pose(gp, 'camera_depth_optical_frame', 'm1n6s200_link_base') #  transfer grasping point from camera frame to base link frame
             gpbo = gp_base.orientation
             e = tft.euler_from_quaternion([gpbo.x, gpbo.y, gpbo.z, gpbo.w])
             # Only really care about rotation about z (e[2]).

@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
+import time
 filter_sizes = [32, 16, 8, 8, 16, 32]
 kernel_sizes = [9, 5, 3, 3, 5, 9]
 strides = [3, 2, 2, 2, 2, 3]
@@ -36,13 +36,12 @@ class GGCNN(nn.Module):
         x = F.relu(self.convt1(x))
         x = F.relu(self.convt2(x))
         x = F.relu(self.convt3(x))
-
         pos_output = self.pos_output(x)
         cos_output = self.cos_output(x)
         sin_output = self.sin_output(x)
         width_output = self.width_output(x)
-
-        return pos_output, cos_output, sin_output, width_output
+        end = time.time()
+        return pos_output.detach().cpu(), cos_output.detach().cpu(), sin_output.detach().cpu(), width_output.detach().cpu()
 
     def compute_loss(self, xc, yc):
         y_pos, y_cos, y_sin, y_width = yc
