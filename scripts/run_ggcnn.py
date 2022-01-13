@@ -200,6 +200,7 @@ def depth_callback(depth_message):
 
         # point_depth = depth[max_pixel[0], max_pixel[1]] 
         point_depth = depth[max_pixel[0], max_pixel[1]]/1000 # zl revised
+        print(point_depth)
 
 
 

@@ -58,8 +58,8 @@ prev_mp = np.array([150, 150])
 ROBOT_Z = 0
 
 # Define image size
-crop_size = 400 # 400 default
-re_size = 400 # 300 default
+crop_size = 440 # 400 default
+re_size = 440 # 300 default
 # Tensorflow graph to allow use in callback.
 # graph = tf.get_default_graph()   // log
 # graph = tf.compat.v1.get_default_graph()
@@ -108,8 +108,11 @@ def depth_callback(depth_message):
     with TimeIt('Crop'):
         depth = bridge.imgmsg_to_cv2(depth_message)
         depth_copy = depth
-        depth = depth/500
-        depth -=1
+        std = 12 * np.std(depth)
+        # depth = depth/500
+        depth = depth/std
+        depth -=depth.mean()
+        # depth -=1
         # print(np.shape(depth))
         # Crop a square out of the middle of the depth and resize it to 300*300
         # crop_size = 400
@@ -150,6 +153,7 @@ def depth_callback(depth_message):
         # print('Mean is:', depth_crop.mean())
         # depth_crop = np.clip((depth_crop - 410), -1, 1)
         depth_input = depth_crop.copy()
+        print('Min:',depth_input.min(),' Max:',depth_input.max())
         # depth_crop = torch.tensor(depth_crop.reshape((1, 300, 300, 1)))
         depth_input = torch.tensor(depth_input.reshape((1,1, re_size, re_size))).to(device)
         # print("shape",np.shape(depth_input))
@@ -179,7 +183,7 @@ def depth_callback(depth_message):
 
     with TimeIt('Filter'):
         # Filter the outputs.
-        points_out = ndimage.filters.gaussian_filter(points_out, 5.0)  # 3.0
+        points_out = ndimage.filters.gaussian_filter(points_out, 1.0)  # 3.0
         ang_out = ndimage.filters.gaussian_filter(ang_out, 2.0)
 
     with TimeIt('Control'):
@@ -212,7 +216,7 @@ def depth_callback(depth_message):
         # point_depth = depth[max_pixel[0], max_pixel[1]] 
         # point_depth = depth[max_pixel[0], max_pixel[1]]/1000 # zl revised
         point_depth = depth_copy[max_pixel[0], max_pixel[1]]/1000 # zl revised
-
+        # print('point depth is:',point_depth)
 
 
 
@@ -281,7 +285,7 @@ def depth_callback(depth_message):
             # print(width)
         else:
             POS +=1
-        print('Rate is:',NEG/(NEG+POS))
+        # print('Rate is:',NEG/(NEG+POS))
 
 
 depth_sub = rospy.Subscriber('/realsense/depth/image_rect_raw', Image, depth_callback, queue_size=1)

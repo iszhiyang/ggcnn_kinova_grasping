@@ -27,7 +27,8 @@ import copy
 safe work space of right gripper wrt. base_link frame
 [x_min, x_max, y_min, y_max, z_min, z_max]
 '''
-safe_work_space = [0.53, 0.86, -0.48, 0.1, 0.95, 1.3]
+safe_work_space = [0.47, 0.86, -0.48, 0.2, 0.93, 1.3]
+# safe_work_space = [0.47, 0.86, -0.48, 0.2, 0.95, 1.3]
 desktop_depth = 0.525
 
 
@@ -130,7 +131,7 @@ class movo_ggcnn():
             if self.openloop == False:
                 gripper_width = msg.data[4] + 5 # offset: 5
                 self.gripper_width_goal = max(min(gripper_width,150),0) / 150 # ratio 0-1
-                print('Infered width:',self.gripper_width_goal)
+                # print('Infered width:',self.gripper_width_goal)
             
             # Construct the Pose in the frame of the camera.
             gp = geometry_msgs.msg.Pose()
@@ -199,7 +200,7 @@ class movo_ggcnn():
         dp = 1 * e[1]
         dyaw = 1 * e[2]
         vx = max(min(dx * 3, self.max_velo[0]), -1.0* self.max_velo[0])
-        vy = max(min(dy * 0.2, self.max_velo[1]), -1.0* self.max_velo[1])
+        vy = max(min(dy * 0.1, self.max_velo[1]), -1.0* self.max_velo[1])
         vz = max(min(dz * 3, self.max_velo[2]), -1.0* self.max_velo[2])
         # Apply a nonlinearity to the velocity
         v = np.array([vx, vy, vz])
@@ -237,6 +238,7 @@ class movo_ggcnn():
         self.gripper_count += 1
         # print('Finger pos',FINGER_POS)
         # print(position)
+        print('Finger position',position[0])
         diff = abs(self.finger_pos - position[0]) # get difference between this frame and last frame
         # print
         if self.start_buffer == True:
@@ -402,7 +404,7 @@ class movo_ggcnn():
 
     def reset(self):
         default_x = 0.047
-        default_y = 0.07
+        default_y = 0.10
         default_z = 0.57
         default_theta_z = -1.577
         dx = default_x - self.current_pos_right_base[0]
